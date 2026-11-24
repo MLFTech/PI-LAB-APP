@@ -1,0 +1,33 @@
+# Render Blueprint: Render > New > Blueprint > pick this GitHub repository.
+# Values marked  sync: false  are asked for once in Render's dashboard (they are secrets, so they are not in GitHub).
+services:
+  - type: web
+    name: pi-lab
+    runtime: python
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: bash build.sh
+    startCommand: gunicorn --chdir backend pilab_site.wsgi:application
+    healthCheckPath: /privacy/
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: PILAB_DEBUG
+        value: "0"
+      - key: PILAB_SECRET_KEY
+        generateValue: true          # Render makes a long random key
+      - key: DATABASE_URL
+        sync: false                  # the connection string from Neon (postgresql://…?sslmode=require)
+      - key: PILAB_GOOGLE_CLIENT_ID
+        sync: false                  # from Google Cloud Console > Clients > your web client
+      - key: PILAB_GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: PILAB_ADMIN_USERNAME
+        sync: false                  # your /admin/ login, created on the first deploy
+      - key: PILAB_ADMIN_EMAIL
+        sync: false
+      - key: PILAB_ADMIN_PASSWORD
+        sync: false                  # at least 12 characters
+      - key: PILAB_CONTACT_EMAIL
+        sync: false                  # shown on /privacy/

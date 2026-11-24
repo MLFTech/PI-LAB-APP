@@ -120,6 +120,23 @@ One-time setup in [Google Cloud Console](https://console.cloud.google.com/):
 `backend/google_oauth.json` holds a secret: keep it private, like `db.sqlite3`.
 Each Google account becomes a Django user named `google:<id>`; they can never log in to /admin/.
 
+## Put Pi Lab online with Render + Neon (free)
+Render runs the site from GitHub; Neon keeps the feedback in PostgreSQL (Render's free disk is wiped on restart,
+and its free database expires after 30 days). Files: `render.yaml` (the Render setup), `build.sh` (runs on deploy).
+
+1. **Neon** (neon.tech): sign up, create a project (region: Singapore / AWS ap-southeast-1), copy the
+   **connection string** (`postgresql://…?sslmode=require`).
+2. **Render** (render.com): sign up with GitHub, **New > Blueprint**, pick `MLFTech/PI-LAB-APP`. Fill in the asked values:
+   `DATABASE_URL` (Neon string), `PILAB_GOOGLE_CLIENT_ID` / `PILAB_GOOGLE_CLIENT_SECRET` (from google_oauth.json),
+   `PILAB_ADMIN_USERNAME` / `_EMAIL` / `_PASSWORD` (your /admin/ login, password 12+ characters), `PILAB_CONTACT_EMAIL`.
+   Deploy. The site is at `https://pi-lab.onrender.com` (or the name Render shows).
+3. **Google Cloud Console**: add `https://YOUR-SITE.onrender.com/auth/google/callback/` to the client's redirect URIs;
+   Branding: home page `https://YOUR-SITE.onrender.com/`, privacy `https://YOUR-SITE.onrender.com/privacy/`,
+   authorised domain `YOUR-SITE.onrender.com`; then Audience > Publish app.
+
+Every `git push` to `main` redeploys automatically. Free Render sites sleep after 15 minutes without visitors;
+the next visit takes up to about a minute to wake it.
+
 ## Put Pi Lab online (PythonAnywhere, free)
 1. `python backend/make_upload_zip.py` makes `pilab-upload.zip` on the Desktop (no database, no Google secret).
 2. Sign up at pythonanywhere.com (free "Beginner" account). Your site will be `https://USERNAME.pythonanywhere.com`.

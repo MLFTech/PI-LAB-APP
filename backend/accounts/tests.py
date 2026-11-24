@@ -80,6 +80,28 @@ class GoogleSignIn(TestCase):
         self.assertFalse(self.client.get('/auth/me/').json()['signed_in'])
 
 
+class EnsureAdmin(TestCase):
+    def run_cmd(self, **env):
+        from io import StringIO
+        from django.core.management import call_command
+        with mock.patch.dict('os.environ', env):
+            out = StringIO()
+            call_command('ensure_admin', stdout=out)
+            return out.getvalue()
+
+    def test_creates_once_and_never_overwrites(self):
+        self.assertIn('skipping', self.run_cmd(PILAB_ADMIN_USERNAME='', PILAB_ADMIN_PASSWORD=''))
+        self.assertIn('created', self.run_cmd(PILAB_ADMIN_USERNAME='boss', PILAB_ADMIN_PASSWORD='a-long-password-1'))
+        self.assertIn('unchanged', self.run_cmd(PILAB_ADMIN_USERNAME='boss', PILAB_ADMIN_PASSWORD='another-password-2'))
+        u = User.objects.get(username='boss')
+        self.assertTrue(u.is_superuser and u.check_password('a-long-password-1'))
+
+    def test_short_password_refused(self):
+        from django.core.management.base import CommandError
+        with self.assertRaises(CommandError):
+            self.run_cmd(PILAB_ADMIN_USERNAME='boss', PILAB_ADMIN_PASSWORD='short')
+
+
 class NotSetUp(TestCase):
     @mock.patch.dict('os.environ', {'PILAB_GOOGLE_CLIENT_ID': '', 'PILAB_GOOGLE_CLIENT_SECRET': ''})
     def test_message_when_no_credentials(self):
