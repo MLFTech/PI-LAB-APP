@@ -1,0 +1,22 @@
+# ---- private: never commit these ----
+# the feedback database (names, emails, answers)
+backend/db.sqlite3
+backend/db.sqlite3-journal
+*.sqlite3
+# Google OAuth client secret
+backend/google_oauth.json
+client_secret*.json
+.env
+
+# ---- generated ----
+__pycache__/
+*.pyc
+# made by  manage.py collectstatic
+backend/staticfiles/
+# upload packages from make_upload_zip.py
+*.zip
+
+# ---- local tools and reference copies ----
+.claude/
+# third-party reference only (MIT); the solver does not need it
+BuckinghamPy-master/

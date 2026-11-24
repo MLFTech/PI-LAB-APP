@@ -1,0 +1,25 @@
+/* Symbol keyboard (js/components/symbol-keyboard.js) */
+.skb{display:flex;flex-direction:column;gap:10px;border:2.5px solid var(--ink);border-radius:var(--r3);background:var(--pale);padding:10px 12px}
+.skb__bar{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
+.skb__toggle{font:inherit;font-weight:700;font-size:15px;display:inline-flex;gap:8px;align-items:center;padding:4px 12px;border:2px solid var(--ink);border-radius:10px 4px 10px 4px;background:var(--hi);cursor:pointer}
+.skb__toggle span{font-size:18px;line-height:1}
+.skb__toggle[aria-expanded=false]{background:#fff}
+.skb__target{font-size:13.5px;color:var(--blue);font-weight:700}.skb__target.off{color:var(--mute);font-weight:400}
+.skb__panel{display:flex;flex-direction:column;gap:10px}.skb__panel[hidden]{display:none}
+.skb__hint{font-size:13px;color:var(--mute)}
+.skb__tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:2px dashed var(--dash);padding-bottom:8px}
+.skb__tabs button{font:inherit;font-size:13.5px;padding:4px 12px;border:2px solid var(--ink);border-radius:16px;background:#fff;cursor:pointer}
+.skb__tabs button.on{background:var(--ink);color:#fff}
+.skb__keys{display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;padding-right:4px;overscroll-behavior:contain}
+.skb__grp h4{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.skb__row{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px}
+.skb__k{font-family:var(--serif);font-style:italic;font-size:19px;min-height:42px;padding:2px 4px;border:2px solid var(--ink);border-radius:8px 3px 8px 3px;background:#fff;color:var(--ink);cursor:pointer;touch-action:manipulation;box-shadow:0 2px 0 var(--ink);transition:transform .05s}
+.skb__k--w{grid-column:span 2;font-size:17px}
+.skb__k:hover{background:var(--cream)}.skb__k:active{transform:translateY(2px);box-shadow:none;background:var(--hi)}
+.skb__ctl{display:flex;gap:6px;flex-wrap:wrap}
+.skb__ctl button{font:inherit;font-size:15px;min-height:40px;min-width:46px;padding:2px 12px;border:2px solid var(--ink);border-radius:8px 3px 8px 3px;background:#fff;cursor:pointer;box-shadow:0 2px 0 var(--ink);touch-action:manipulation}
+.skb__ctl button:active{transform:translateY(2px);box-shadow:none}
+.skb__ctl .skb__space{flex:1;color:var(--mute)}
+.skb__ctl [data-ctl=back]{background:var(--badbg)}
+input.skb-on,textarea.skb-on{outline:3px solid var(--hi);outline-offset:1px;background:var(--cream)}
+@media (max-width:440px){.skb__row{grid-template-columns:repeat(auto-fill,minmax(40px,1fr))}.skb__k{font-size:17px;min-height:40px}}

@@ -1,0 +1,21 @@
+:root{
+  --ink:#22252b;--paper:#fbfaf5;--grid:#e6e8ee;--hi:#ffe66d;--blue:#3b6fd4;--mute:#6b7280;
+  --body:#3a3f48;--cream:#fffbd6;--pale:#f4f6fb;--ice:#eaf0ff;--dash:#b9bec8;--ok:#2f8f5b;--bad:#d4493b;--okbg:#e8f6ee;--badbg:#fdecea;
+  --sans:'Shantell Sans','Comic Relief','Comic Neue','Comic Sans MS',system-ui,sans-serif;
+  --serif:'Source Serif 4','DejaVu Serif',Georgia,'Times New Roman',serif;
+  --gutter:clamp(14px,4.4vw,64px);
+  --r1:26px 8px 22px 8px;--r2:8px 26px 8px 22px;--r3:14px 6px 14px 6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px;
+  line-height:1.5;min-height:100vh;overflow-x:hidden}
+img,svg{max-width:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.math{font-family:var(--serif);font-style:italic}
+.math sub,.math sup{font-size:.62em}
+.hl{background:linear-gradient(transparent 55%,var(--hi) 55%);padding:0 .12em}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}

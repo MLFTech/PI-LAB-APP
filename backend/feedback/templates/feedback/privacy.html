@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy policy · Pi Lab</title>
+<link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Shantell+Sans:wght@400;600;700&family=Source+Serif+4:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/tokens.css"><link rel="stylesheet" href="/css/components.css">
+<style>
+  .pp{max-width:780px}.pp h1{margin:6px 0 4px}.pp h2{font-size:clamp(20px,2vw,26px);margin:26px 0 6px}
+  .pp ul{margin:6px 0 6px 22px;display:flex;flex-direction:column;gap:4px}.pp li{font-size:clamp(15px,1.3vw,18px);line-height:1.55;color:var(--body)}
+  .pp .sk{padding:clamp(18px,3vw,34px);margin-top:18px}.pp .when{color:var(--mute);font-size:15px}
+  .pp .top{display:flex;align-items:center;gap:12px;font-weight:700;font-size:22px}.pp .top img{width:44px;height:44px}
+</style>
+</head><body>
+<main class="page pp">
+  <a class="top" href="/"><img src="/img/logo.svg" alt="">Pi Lab</a>
+  <div class="sk">
+    <h1>Privacy policy</h1>
+    <p class="when">Last updated {{ updated }}</p>
+
+    <p>Pi Lab is a learning website about the Buckingham Pi theorem, built as a final year project. This page explains
+      what Pi Lab stores about you, why, and what you can do about it.</p>
+
+    <h2>What Pi Lab stores</h2>
+    <ul>
+      <li><b>When you sign in with Google:</b> your Google account ID, email address and name. Pi Lab never sees or stores your Google password.</li>
+      <li><b>When you send the feedback questionnaire:</b> your name, occupation, programme or field (if you give one) and your answers.</li>
+      <li><b>A sign-in cookie</b> that keeps you signed in for up to two weeks, and a security cookie that protects forms. There are no advertising or tracking cookies.</li>
+      <li>The guide, exercises and calculator work without signing in, and nothing you type in the calculator is saved.</li>
+    </ul>
+
+    <h2>Why</h2>
+    <ul>
+      <li>Your answers are used only to evaluate Pi Lab as part of the final year project (for example, the average usability score).</li>
+      <li>Your email address is used only to make sure each person answers the questionnaire once.</li>
+    </ul>
+
+    <h2>Who can see it</h2>
+    <ul>
+      <li>Only the project's author{% if contact %} ({{ contact }}){% endif %}, and the project supervisor and examiners if they ask, through a password-protected admin page.</li>
+      <li>Results are reported as totals and averages. Your name and email are never published or shared, and are not sold or used for advertising.</li>
+    </ul>
+
+    <h2>How long it is kept</h2>
+    <ul>
+      <li>Until the final year project has been assessed. After that the responses and accounts are deleted.</li>
+    </ul>
+
+    <h2>Your choices</h2>
+    <ul>
+      <li>Answering the questionnaire is voluntary. You can stop at any time before pressing Send.</li>
+      <li>You can ask for your response and account to be deleted{% if contact %} by emailing <a href="mailto:{{ contact }}">{{ contact }}</a>{% endif %}.</li>
+      <li>You can also remove Pi Lab's access to your Google account at any time at
+        <a href="https://myaccount.google.com/connections">myaccount.google.com/connections</a>.</li>
+    </ul>
+  </div>
+  <p style="margin-top:18px"><a class="btn btn--sm" href="/">← Back to Pi Lab</a></p>
+</main>
+</body></html>

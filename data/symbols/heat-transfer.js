@@ -1,0 +1,72 @@
+/* Variable symbols for the "Heat transfer" tab of the symbol keyboard.
+   One row per key:  [symbol, meaning, M, L, T, Θ]   (the powers of mass, length, time and temperature)
+   Tapping a key in the calculator types the symbol AND fills in its M, L, T, Θ powers.
+   Optional 7th item: the text to type, if it differs from the symbol shown on the key. */
+window.PiLab.symbols = window.PiLab.symbols || {};
+window.PiLab.symbols.heat = {
+  label: 'Heat transfer',
+  groups: [
+    { title: 'Temperature and heat', keys: [
+      //  symbol  meaning                        M   L   T   Θ
+      ['T',  'temperature',                      0,  0,  0,  1],
+      ['ΔT', 'temperature difference',           0,  0,  0,  1],
+      ['T∞', 'free-stream temperature',          0,  0,  0,  1],
+      ['Tₛ', 'surface temperature',              0,  0,  0,  1],
+      ['q',  'heat transfer rate',               1,  2, -3,  0],
+      ['Q̇',  'heat transfer rate',               1,  2, -3,  0],
+      ['q″', 'heat flux',                        1,  0, -3,  0],
+      ['q‴', 'heat generation per volume',       1, -1, -3,  0],
+      ['Q',  'heat',                             1,  2, -2,  0],
+      ['ė',  'energy generation rate',           1,  2, -3,  0],
+      ['θ',  'excess temperature',               0,  0,  0,  1],
+      ['β',  'thermal expansion coefficient',    0,  0,  0, -1],
+    ] },
+    { title: 'Material properties', keys: [
+      ['k',  'thermal conductivity',             1,  1, -3, -1],
+      ['h',  'convection coefficient',           1,  0, -3, -1],
+      ['α',  'thermal diffusivity',              0,  2, -1,  0],
+      ['cₚ', 'specific heat (constant p)',       0,  2, -2, -1],
+      ['cᵥ', 'specific heat (constant v)',       0,  2, -2, -1],
+      ['ρ',  'density',                          1, -3,  0,  0],
+      ['μ',  'dynamic viscosity',                1, -1, -1,  0],
+      ['ν',  'kinematic viscosity',              0,  2, -1,  0],
+      ['ε',  'emissivity',                       0,  0,  0,  0],
+      ['σ',  'Stefan–Boltzmann constant',        1,  0, -3, -4],
+      ['α_s', 'absorptivity',                    0,  0,  0,  0],
+      ['h_fg', 'latent heat of vaporisation',    0,  2, -2,  0],
+      ['D_AB', 'mass diffusivity',               0,  2, -1,  0],
+      ['h_m', 'mass transfer coefficient',       0,  1, -1,  0],
+    ] },
+    { title: 'Geometry and resistance', keys: [
+      ['L',  'length',                           0,  1,  0,  0],
+      ['L_c', 'characteristic length',           0,  1,  0,  0],
+      ['D',  'diameter',                         0,  1,  0,  0],
+      ['r',  'radius',                           0,  1,  0,  0],
+      ['x',  'distance',                         0,  1,  0,  0],
+      ['A',  'area',                             0,  2,  0,  0],
+      ['Aₛ', 'surface area',                     0,  2,  0,  0],
+      ['V',  'volume',                           0,  3,  0,  0],
+      ['t',  'time',                             0,  0,  1,  0],
+      ['R_th', 'thermal resistance',            -1, -2,  3,  1],
+      ['U',  'overall heat transfer coefficient', 1, 0, -3, -1],
+      ['δ_t', 'thermal boundary-layer thickness', 0, 1,  0,  0],
+      ['g',  'gravity',                          0,  1, -2,  0],
+    ] },
+    { title: 'Dimensionless groups', keys: [
+      ['Nu', 'Nusselt number',                   0,  0,  0,  0],
+      ['Pr', 'Prandtl number',                   0,  0,  0,  0],
+      ['Gr', 'Grashof number',                   0,  0,  0,  0],
+      ['Ra', 'Rayleigh number',                  0,  0,  0,  0],
+      ['Bi', 'Biot number',                      0,  0,  0,  0],
+      ['Fo', 'Fourier number',                   0,  0,  0,  0],
+      ['Pe', 'Péclet number',                    0,  0,  0,  0],
+      ['St', 'Stanton number',                   0,  0,  0,  0],
+      ['Ec', 'Eckert number',                    0,  0,  0,  0],
+      ['Le', 'Lewis number',                     0,  0,  0,  0],
+      ['Sc', 'Schmidt number',                   0,  0,  0,  0],
+      ['Sh', 'Sherwood number',                  0,  0,  0,  0],
+      ['Ja', 'Jakob number',                     0,  0,  0,  0],
+      ['NTU', 'number of transfer units',        0,  0,  0,  0],
+    ] },
+  ],
+};

@@ -1,0 +1,51 @@
+/* Feedback page (js/templates/feedback.js) */
+.fb{max-width:980px}
+.fb__lead{margin-top:10px;max-width:62ch}
+.fb__privacy{margin-top:8px;max-width:70ch}
+#fb-body{margin-top:22px}
+.fb__form{display:flex;flex-direction:column;gap:clamp(16px,2vw,24px)}
+.fb__bar{position:sticky;top:8px;z-index:5;display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--paper)}
+.fb__track{flex:1;height:12px;border:2px solid var(--ink);border-radius:8px;background:#fff;overflow:hidden}
+.fb__track i{display:block;height:100%;width:0;background:var(--hi);transition:width .25s}
+.fb__bar .note{white-space:nowrap;color:var(--ink);font-size:14px}
+.fb__sec{padding:clamp(16px,2.2vw,28px);display:flex;flex-direction:column;gap:6px}
+.fb__intro{font-size:clamp(15px,1.2vw,17px);color:var(--mute);margin-bottom:4px}
+.fb__q{border:0;padding:14px 0 12px;margin:0;border-top:2px dashed var(--dash);min-width:0}
+.fb__sec .fb__q:first-of-type{border-top:0}
+.fb__q-t{display:block;font-weight:700;font-size:clamp(15.5px,1.25vw,17.5px);line-height:1.45;margin-bottom:8px;padding:0}
+.fb__req{font-weight:400;font-size:12px;color:var(--mute);border:1.5px solid var(--dash);border-radius:10px;padding:0 7px;margin-left:4px;vertical-align:2px}
+.fb__q.bad{background:var(--badbg);border-radius:10px;padding-left:10px;padding-right:10px;outline:2.5px solid var(--bad)}
+.fb__opts{display:flex;flex-wrap:wrap;gap:8px}
+.fb__opts--list{flex-direction:column;align-items:flex-start}
+.fb__o{position:relative;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:15px}
+.fb__o input[type=radio]{position:absolute;opacity:0;width:1px;height:1px}
+.fb__o input[type=radio]+span{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:6px 14px;border:2px solid var(--ink);border-radius:12px 4px 12px 4px;background:#fff;line-height:1.25;text-align:center}
+.fb__o input[type=radio]:hover+span{background:var(--cream)}
+.fb__o input[type=radio]:checked+span{background:var(--hi);font-weight:700;box-shadow:0 2px 0 var(--ink)}
+.fb__o input:focus-visible+span{outline:3px solid var(--blue);outline-offset:2px}
+.fb__opts--scale{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.fb__opts--scale .fb__o input+span{width:100%;font-size:14px}
+.fb__opts--star .fb__o input+span{flex-direction:column;gap:2px}
+.fb__opts--ten{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:6px}
+.fb__opts--ten .fb__o input+span{width:100%;padding:6px 0;font-weight:700}
+.fb__ends{display:flex;justify-content:space-between;gap:10px;margin-top:6px;font-size:13px;color:var(--mute)}
+.fb__other{margin-top:10px;max-width:420px}.fb__other[hidden]{display:none}
+.fb__q .inp{max-width:560px}.fb__q .ta{max-width:none;min-height:90px;background:#fff}
+.fb__send{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.fb__send .btn{min-width:220px}
+.fb__done{padding:clamp(22px,3vw,40px);display:flex;flex-direction:column;align-items:flex-start;gap:12px;background:var(--cream)}
+.fb__tick{width:56px;height:56px;display:grid;place-items:center;font-size:30px;font-weight:700;background:var(--hi);border:2.5px solid var(--ink);border-radius:50%}
+/* sign in first (backend/accounts) */
+.fb__gate{padding:clamp(22px,3vw,40px);display:flex;flex-direction:column;align-items:flex-start;gap:12px;background:var(--pale);max-width:720px}
+.fb__lock{font-size:34px;line-height:1}
+.fb__g{gap:12px}
+.fb__gi{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#fff;color:#4285f4;font-weight:700;font-family:Arial,sans-serif;font-size:18px}
+.fb__who{font-size:15px;color:var(--mute)}.fb__who b{color:var(--ink);overflow-wrap:anywhere}
+.linkb{background:none;border:0;color:var(--blue);text-decoration:underline;text-decoration-style:dashed;font:inherit;padding:0;cursor:pointer}
+@media (max-width:640px){
+  .fb__opts--scale{grid-template-columns:1fr;gap:6px}
+  .fb__opts--scale .fb__o input+span{justify-content:flex-start;text-align:left;min-height:38px}
+  .fb__opts--star .fb__o input+span{flex-direction:row;gap:8px}
+  .fb__opts--ten{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .fb__bar{top:4px}
+}
