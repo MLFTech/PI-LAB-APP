@@ -1,4 +1,4 @@
-/* Pi Lab core helpers + registries. Data files call PiLab.registerGuide / registerExercise. */
+/* BuckinghamEdu core helpers + registries. Data files call PiLab.registerGuide / registerExercise. */
 (function () {
   const PiLab = (window.PiLab = window.PiLab || {});
   PiLab.guides = []; PiLab.exercises = []; PiLab.activities = {}; PiLab.templates = {}; PiLab.shared = {}; PiLab.home = null;

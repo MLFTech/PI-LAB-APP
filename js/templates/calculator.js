@@ -95,7 +95,7 @@
     return `<div class="sum">${[['Variables n', r.n], ['Dimensions k', r.k], ['Π groups n − k', r.n_pi]].map(([k, v]) => `<div class="sk sk--sm"><b>${v}</b><span>${k}</span></div>`).join('')}</div>
       ${r.warnings.map((w) => `<p class="note warn">${esc(w)}</p>`).join('')}
       <p class="lbl">Repeating variables</p><p>${res.repeating_names.map((n) => `<span class="chip math">${esc(n)}</span>`).join('')}
-        <span class="note">${r.auto ? 'chosen by Pi Lab (none were ticked)' : 'your choice'} · k = ${r.k} for ${r.dims.join(', ')}</span></p>
+        <span class="note">${r.auto ? 'chosen by BuckinghamEdu (none were ticked)' : 'your choice'} · k = ${r.k} for ${r.dims.join(', ')}</span></p>
       <p class="lbl">Dimensionless groups</p><ol class="pis">${res.groups.map(groupHtml).join('')}</ol>
       ${rows ? `<p class="lbl">Recognised numbers</p><p class="note">Any product of Π groups is also a Π group. Combining them like this turns the groups above into well-known numbers:</p>
         <ol class="pis">${rows.map((g) => `<li class="sk sk--sm pi ${g.from ? 'pi--new' : ''}"><span class="pi__id math">${g.id}</span><span class="pi__e math">${expr(g.terms)}</span>
@@ -103,7 +103,7 @@
       <p class="lbl">Final equation</p>
       <div class="eqs">${eqs.map(([l, q], k) => `<div class="sk sk--sm eqb ${k === eqs.length - 1 ? 'eqb--hi' : ''}"><span class="note">${l}</span><div class="eq math">${q}</div></div>`).join('')}</div>
       <div class="row-act"><button class="btn btn--sm" type="button" data-act="copy">Copy equation</button><span class="note" id="copied" aria-live="polite"></span></div>
-      <details class="kinds-read"><summary>How Pi Lab read your variables</summary><ul>${r.variables.map((v) => `<li><b class="math">${esc(v.name)}</b> [${dimTxt(v.dims)}] → ${v.kind_label ? esc(v.kind_label) : '<span class="note">not recognised (its groups can still be built)</span>'}</li>`).join('')}</ul>
+      <details class="kinds-read"><summary>How BuckinghamEdu read your variables</summary><ul>${r.variables.map((v) => `<li><b class="math">${esc(v.name)}</b> [${dimTxt(v.dims)}] → ${v.kind_label ? esc(v.kind_label) : '<span class="note">not recognised (its groups can still be built)</span>'}</li>`).join('')}</ul>
         <p class="note">Named numbers are spotted from each variable's symbol and dimensions, e.g. h with M T⁻³ Θ⁻¹ is a heat transfer coefficient.</p></details>
       ${r.alternatives.length ? `<details class="alts"><summary>Other valid sets of repeating variables (${r.alternatives_total})</summary>
         ${r.alternatives.map((s, k) => `<div class="sk sk--sm alt"><div class="alt__h"><span>${s.repeating_names.map((n) => `<span class="chip math">${esc(n)}</span>`).join('')}</span>
@@ -149,7 +149,7 @@
     }
     function stat() {
       const k = rows.filter((r) => r.rep).length;
-      $('#nstat').textContent = k ? `${k} repeating selected` : 'no repeating ticked: Pi Lab will choose';
+      $('#nstat').textContent = k ? `${k} repeating selected` : 'no repeating ticked: BuckinghamEdu will choose';
       nvar.value = rows.length;
     }
     function drawDep() {

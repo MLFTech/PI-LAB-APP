@@ -9,7 +9,7 @@
     window.addEventListener('hashchange', route); route();
   }
   function header(active) {
-    chrome.innerHTML = `<nav class="sk nav" aria-label="Main"><a class="logo" href="#/"><img src="img/logo.svg" alt="" width="44" height="44">Pi Lab</a>
+    chrome.innerHTML = `<nav class="sk nav" aria-label="Main"><a class="logo" href="#/"><img src="img/logo.svg" alt="" width="44" height="44">BuckinghamEdu</a>
       <div class="nav__links" id="links">${NAV.map(([l, h]) => `<a href="${h}" class="${l === active ? 'on' : ''}">${l}</a>`).join('')}</div>
       <button class="nav__burger" aria-label="Menu" aria-expanded="false">☰</button></nav>`;
     const b = P.$('.nav__burger', chrome), l = P.$('#links', chrome);
@@ -24,16 +24,16 @@
       if (!id || !item) { location.replace(`#/${area}/${list[0].id}`); return; }
       header(area === 'guide' ? 'Guide' : 'Exercise');
       view.innerHTML = P.templates[area](item, list);
-      document.title = `${item.title || 'Guide'} · Pi Lab`;
+      document.title = `${item.title || 'Guide'} · BuckinghamEdu`;
       if (area === 'exercise') P.mountExercise(item, view);
     } else if (area === 'calculator') {
-      header('Calculator'); document.title = 'Calculator · Pi Lab';
+      header('Calculator'); document.title = 'Calculator · BuckinghamEdu';
       view.innerHTML = P.templates.calculator(P.calculator); P.mountCalculator(P.calculator, view);
     } else if (area === 'feedback') {
-      header('Feedback'); document.title = 'Feedback · Pi Lab';
+      header('Feedback'); document.title = 'Feedback · BuckinghamEdu';
       view.innerHTML = P.templates.feedback(P.feedback);
     } else {
-      header('Home'); document.title = 'Pi Lab · Learn the Buckingham Pi theorem'; view.innerHTML = P.templates.home(P.home);
+      header('Home'); document.title = 'BuckinghamEdu · Learn the Buckingham Pi theorem'; view.innerHTML = P.templates.home(P.home);
     }
     window.scrollTo(0, 0);
   }

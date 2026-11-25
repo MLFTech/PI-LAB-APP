@@ -37,7 +37,7 @@
       <div class="ghead"><div class="crumb"><a href="#/guide">Guide</a> &nbsp;/&nbsp; Buckingham Pi theorem${all.length > 1 ? ` &nbsp;/&nbsp; ${g.crumb}` : ''}</div>
         <h1>Buckingham Pi theorem, <span class="hl">step by step</span></h1><div class="sub">${g.subtitle}</div>${tabs}</div>
       <section class="prob"><div class="sk pbox"><span class="tag">Problem statement</span><p>${g.problem.text}</p><div class="eq sk sk--sm">${g.problem.equation}</div><p style="font-size:clamp(15px,1.3vw,18px)">${g.problem.goal}</p></div>
-        <div class="sk fig">${g.problem.figure}<div class="cap">← sketch: every labelled quantity goes into Step 1</div></div></section>
+        <div class="sk fig">${g.problem.figure}<div class="cap"><span class="cap__ar" aria-hidden="true"></span>sketch: every labelled quantity goes into Step 1</div></div></section>
       <section class="steps">${steps}</section>
       <div class="foot">${g.footer.map((f, i) => `<a class="btn ${f.primary ? 'btn--p' : ''}" href="${f.href}">${f.label}</a>`).join('')}</div>
       <div class="src">${g.source}</div></div>`;

@@ -6,6 +6,13 @@
 .fig{padding:12px;position:relative;display:flex;flex-direction:column;justify-content:center}
 .fig svg{display:block;width:100%;height:auto}
 .fig .cap{font-size:14px;color:var(--blue);padding:4px 10px}
+.cap__ar::before{content:"← "}
+/* phones and narrow tablets: one column, with the problem's illustration above the statement */
+@media (max-width:900px){
+  .prob{grid-template-columns:1fr}
+  .prob .fig{order:-1}
+  .cap__ar::before{content:"↓ "}
+}
 .steps{display:flex;flex-direction:column;gap:26px}
 .step{display:grid;grid-template-columns:110px minmax(0,1fr);gap:clamp(14px,2vw,26px);padding:clamp(18px,2.4vw,30px) clamp(16px,2.4vw,32px);align-items:start}
 .step:nth-child(even){border-radius:var(--r2)}

@@ -1,4 +1,4 @@
-"""Buckingham Pi engine for Pi Lab.
+"""Buckingham Pi engine for BuckinghamEdu.
 
 The method follows BuckinghamPy (Mokbel Karam & Tony Saad, MIT licence; see BuckinghamPy-master/):
 build the dimension matrix, try each set of k repeating variables that leaves out the dependent
@@ -172,7 +172,7 @@ class Problem:
         if len(chosen) != k:
             raise PiError(f'You ticked {len(chosen)} repeating variable{"s" if len(chosen) != 1 else ""}, but the number of '
                           f'repeating variables must equal the number of fundamental dimensions: k = {k} ({dims}). '
-                          f'Tick exactly {k}, or untick them all and Pi Lab will choose.')
+                          f'Tick exactly {k}, or untick them all and BuckinghamEdu will choose.')
         missing = [DIMS[d] for d in self.used if all(self.vars[j]['dims'][d] == 0 for j in chosen)]
         if missing:
             raise PiError(f'Together, {self.names(chosen)} do not contain {" or ".join(missing)}, '

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="t">
-  <title id="t">Pi Lab</title>
-  <!-- Pi Lab logo: a hand-drawn π on a lab tile, with flow lines passing it (fluid mechanics)
+  <title id="t">BuckinghamEdu</title>
+  <!-- BuckinghamEdu logo: a hand-drawn π on a lab tile, with flow lines passing it (fluid mechanics)
        and a highlighter swipe (learning). Colours match css/tokens.css. -->
   <!-- tile: offset shadow, then the card with the site's uneven corners -->
   <path d="M18 12 H100 Q112 12 112 24 V104 Q112 114 102 114 H22 Q10 114 10 102 V22 Q10 12 18 12 Z" fill="#22252b"/>

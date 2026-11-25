@@ -1,4 +1,4 @@
-# Pi Lab
+# BuckinghamEdu
 
 Responsive app (no build step). The pages are plain HTML/CSS/JS; the calculator's Π-group solver and AI variable
 extractor are Python, served by Django. No database.
@@ -91,7 +91,14 @@ one is dependent; **Use these in the table** fills the variable table.
 The **Feedback** page explains why feedback matters for the final year project and links to the Google Form
 (`formUrl` in `data/feedback.js`). Responses are collected and exported by Google Forms (Responses > Link to Sheets).
 
-## Put Pi Lab online with Render (free)
+## Search engines
+`index.html` has a description, link-preview tags, PNG icons (`img/favicon-48.png`, the one Google shows next to
+results, plus 192 px, Apple touch icon and `img/logo-512.png`) and structured data naming the site **BuckinghamEdu**
+with its logo. The server fills in the site's address (`__SITE__`) and serves `/robots.txt` and `/sitemap.xml`.
+With a custom domain, set `PILAB_SITE_URL` (e.g. `https://www.buckinghamedu.com`).
+Register the site in Google Search Console and submit `/sitemap.xml` (see the steps in the project notes).
+
+## Put BuckinghamEdu online with Render (free)
 Files: `render.yaml` (the Render setup) and `build.sh` (runs on each deploy).
 
 1. **Render** (render.com): sign up with GitHub, **New > Blueprint**, pick `MLFTech/PI-LAB-APP`.
@@ -101,7 +108,7 @@ Files: `render.yaml` (the Render setup) and `build.sh` (runs on each deploy).
 Every `git push` to `main` redeploys automatically. Free Render sites sleep after 15 minutes without visitors;
 the next visit takes up to about a minute to wake it.
 
-## Put Pi Lab online (PythonAnywhere, free)
+## Put BuckinghamEdu online (PythonAnywhere, free)
 1. Sign up at pythonanywhere.com (free "Beginner" account). Your site will be `https://USERNAME.pythonanywhere.com`.
 2. **Consoles > Bash**:
    ```

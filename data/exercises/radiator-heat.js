@@ -81,6 +81,6 @@
       fn: `${F('Q', 'ρ V³ D²')} = f ( ${F('μ', 'ρ V D')}, ${F(`ρ V D ${cp}`, 'k')}, ${F('k ΔT', 'ρ V³ D')} )`,
     },
     footer: [{ label: '← Guide', href: '#/guide' }, { label: 'Open the calculator →', href: '#/calculator', primary: true }],
-    source: 'Pi Lab · exercise adapted from a car radiator heat transfer problem',
+    source: 'BuckinghamEdu · exercise adapted from a car radiator heat transfer problem',
   });
 })();

@@ -2,7 +2,7 @@
    The Π groups come from the Python solver, and the variable list from the AI extractor (backend/, Django) through `api`. */
 window.PiLab.calculator = {
   title: 'Π-group calculator',
-  lead: 'Describe your problem or enter its variables, and let Pi Lab build the dimensionless groups.',
+  lead: 'Describe your problem or enter its variables, and let BuckinghamEdu build the dimensionless groups.',
   maxRows: 12,
   extractor: {
     title: 'AI variable extractor',
@@ -18,7 +18,7 @@ window.PiLab.calculator = {
   },
   input: {
     title: 'Your variables',
-    hint: 'Set how many variables, then enter each name and its powers of M, L, T and Θ. Choose the dependent variable, and tick the repeating variables (as many as there are fundamental dimensions), or leave them all unticked and Pi Lab will choose.',
+    hint: 'Set how many variables, then enter each name and its powers of M, L, T and Θ. Choose the dependent variable, and tick the repeating variables (as many as there are fundamental dimensions), or leave them all unticked and BuckinghamEdu will choose.',
     columns: ['Variable', 'M', 'L', 'T', 'Θ', 'Repeat'],
     dependentLabel: 'Dependent variable',
     noDependent: 'none (no single result)',
@@ -36,6 +36,6 @@ window.PiLab.calculator = {
   answer: {
     title: 'Answer',
     empty: 'Fill in your variables, then press <b>Calculate Π groups</b>. The groups, the working and any well-known numbers (Reynolds, Nusselt, Prandtl …) will appear here.',
-    offline: 'Could not reach the Pi Lab solver. Start the Django server from the pilab folder with <code>python backend/manage.py runserver</code>, then open <code>http://127.0.0.1:8000/#/calculator</code>.'
+    offline: 'Could not reach the BuckinghamEdu solver. Start the Django server from the pilab folder with <code>python backend/manage.py runserver</code>, then open <code>http://127.0.0.1:8000/#/calculator</code>.'
   }
 };

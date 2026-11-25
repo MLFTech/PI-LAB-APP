@@ -133,9 +133,19 @@ class Api(SimpleTestCase):
         self.assertEqual(res.status_code, 200)
 
     def test_page_and_files_are_served(self):
-        self.assertContains(self.client.get('/'), 'Pi Lab')
+        self.assertContains(self.client.get('/'), 'BuckinghamEdu')
         self.assertEqual(self.client.get('/js/app.js').status_code, 200)
         self.assertEqual(self.client.get('/img/logo.svg').status_code, 200)
+        self.assertEqual(self.client.get('/img/favicon-48.png').status_code, 200)
+
+    def test_search_engine_files(self):
+        page = self.client.get('/').content.decode()
+        self.assertNotIn('__SITE__', page)
+        self.assertIn('"logo":"http://testserver/img/logo-512.png"', page)
+        self.assertContains(self.client.get('/robots.txt'), 'Sitemap: http://testserver/sitemap.xml')
+        self.assertContains(self.client.get('/sitemap.xml'), '<loc>http://testserver/</loc>')
+        with self.settings(SITE_URL='https://www.example.edu'):
+            self.assertIn('https://www.example.edu/img/logo-512.png', self.client.get('/').content.decode())
         self.assertEqual(self.client.get('/api/named-groups/').status_code, 200)
 
 

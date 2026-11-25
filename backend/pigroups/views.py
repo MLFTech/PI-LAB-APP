@@ -1,4 +1,4 @@
-"""HTTP layer: serves the Pi Lab page and the JSON APIs used by the calculator (solver + AI variable extractor)."""
+"""HTTP layer: serves the BuckinghamEdu page and the JSON APIs used by the calculator (solver + AI variable extractor)."""
 import json
 
 from django.conf import settings
@@ -17,11 +17,31 @@ def _json(data, status=200):
     return JsonResponse(data, status=status, json_dumps_params={'ensure_ascii': False})
 
 
+def _site(request):
+    """The site's public address, e.g. https://buckinghamedu.onrender.com (PILAB_SITE_URL overrides it)."""
+    return (settings.SITE_URL or request.build_absolute_uri('/')).rstrip('/')
+
+
 @ensure_csrf_cookie            # gives the page the csrftoken cookie it sends back with each calculation
 @require_GET
 def index(request):
     html = (settings.FRONTEND_DIR / 'index.html').read_text(encoding='utf-8')
-    return HttpResponse(html, content_type='text/html; charset=utf-8')
+    return HttpResponse(html.replace('__SITE__', _site(request)), content_type='text/html; charset=utf-8')
+
+
+@require_GET
+def robots(request):
+    """/robots.txt: let search engines read the site (not the API) and point them to the sitemap."""
+    body = f'User-agent: *\nDisallow: /api/\nAllow: /\n\nSitemap: {_site(request)}/sitemap.xml\n'
+    return HttpResponse(body, content_type='text/plain; charset=utf-8')
+
+
+@require_GET
+def sitemap(request):
+    """/sitemap.xml: the pages are one address (the sections are #/… links inside it)."""
+    body = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            f'  <url><loc>{_site(request)}/</loc></url>\n</urlset>\n')
+    return HttpResponse(body, content_type='application/xml; charset=utf-8')
 
 
 @require_POST

@@ -1,7 +1,7 @@
 PiLab.home = {
   tag: 'Free · Step by step · No units required',
   headline: 'Mastering <span class="hl">your model</span> starts here.',
-  brief: 'Test a small model, then predict how the full-size machine behaves. Pi Lab teaches the Buckingham Pi theorem with short lessons, practice problems and a calculator that finds the dimensionless numbers for you.',
+  brief: 'Test a small model, then predict how the full-size machine behaves. BuckinghamEdu teaches the Buckingham Pi theorem with short lessons, practice problems and a calculator that finds the dimensionless numbers for you.',
   ctas: [{ label: 'Start the guide', href: '#/guide' }, { label: 'Try the exercises', href: '#/exercise' }],
   sketch: `<svg viewBox="0 0 560 370" role="img" aria-label="Five variables, three dimensions, two groups" font-family="Shantell Sans,Comic Relief,sans-serif" stroke-linecap="round" stroke-linejoin="round">
     <rect x="28" y="28" width="176" height="270" rx="14" fill="#fff" stroke="#22252b" stroke-width="2.5"/>

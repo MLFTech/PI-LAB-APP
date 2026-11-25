@@ -16,6 +16,8 @@ def serve_fresh(request, path, document_root):
 urlpatterns = [
     path('api/', include('pigroups.urls')),
     path('', views.index, name='index'),
+    path('robots.txt', views.robots, name='robots'),
+    path('sitemap.xml', views.sitemap, name='sitemap'),
     # the front end's own files. Fine for development and small deployments; behind a real web server
     # (nginx ...) serve css/, js/, data/ and img/ directly instead.
     re_path(r'^(?P<path>(?:css|js|data|img)/.+)$', serve_fresh, {'document_root': settings.FRONTEND_DIR}),

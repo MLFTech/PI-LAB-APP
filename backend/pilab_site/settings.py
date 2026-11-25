@@ -1,4 +1,4 @@
-"""Django settings for the Pi Lab site.
+"""Django settings for the BuckinghamEdu site.
 
 Django serves the static front end (index.html, css/, js/, data/, img/ in the folder above `backend/`) and two
 JSON APIs used by the calculator: /api/pi-groups/ (the Π-group solver) and /api/extract-variables/ (the AI variable
@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent          # backend/
-FRONTEND_DIR = BASE_DIR.parent                             # the Pi Lab site (index.html, css, js, data, img)
+FRONTEND_DIR = BASE_DIR.parent                             # the BuckinghamEdu site (index.html, css, js, data, img)
 
 SECRET_KEY = os.environ.get('PILAB_SECRET_KEY', 'dev-only-insecure-key-change-me-before-deploying')
 DEBUG = os.environ.get('PILAB_DEBUG', '1') == '1'
@@ -41,6 +41,10 @@ CSRF_TRUSTED_ORIGINS = [f'https://{h}' for h in ALLOWED_HOSTS if h not in ('loca
 
 # a calculator request is a few hundred bytes; an extractor request can carry one picture (resized in the browser)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024
+
+# the public address used in search-engine tags, robots.txt and sitemap.xml; by default the address being visited.
+# Set it when the site has its own domain, e.g. PILAB_SITE_URL=https://www.buckinghamedu.com
+SITE_URL = os.environ.get('PILAB_SITE_URL', '').strip()
 
 # AI variable extractor (pigroups/extract.py)
 EXTRACT_MODEL = os.environ.get('PILAB_EXTRACT_MODEL', 'claude-opus-5-5')

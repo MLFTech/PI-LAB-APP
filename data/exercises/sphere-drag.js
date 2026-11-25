@@ -61,6 +61,6 @@
       fn: `${PiLab.frac(`F${S('D')}`, 'ρ V² D²')} = f ( Re )`,
     },
     footer: [{ label: '← Guide', href: '#/guide' }, { label: 'Open the calculator →', href: '#/calculator', primary: true }],
-    source: 'Pi Lab · exercises adapted from the sphere drag and 1:5 model similarity problem',
+    source: 'BuckinghamEdu · exercises adapted from the sphere drag and 1:5 model similarity problem',
   });
 })();
