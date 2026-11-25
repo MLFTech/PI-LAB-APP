@@ -1,6 +1,5 @@
 Django>=5.0,<7
-# online hosting (Render): web server, the admin's static files, and the PostgreSQL database (Neon)
+# AI variable extractor (calls Claude; needs ANTHROPIC_API_KEY on the server)
+anthropic>=2.14,<3
+# web server for online hosting (Render, PythonAnywhere)
 gunicorn>=23
-whitenoise>=6.9,<7
-dj-database-url>=2.3,<4
-psycopg[binary]>=3.2,<4

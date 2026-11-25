@@ -13,6 +13,28 @@
 .lbl{font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);margin-top:6px}
 .think{display:flex;gap:8px;padding:10px}.think i{width:12px;height:12px;border-radius:50%;background:var(--ink);animation:bl 1s infinite}.think i:nth-child(2){animation-delay:.15s}.think i:nth-child(3){animation-delay:.3s}
 @keyframes bl{50%{opacity:.2;transform:translateY(-4px)}}
+/* AI variable extractor card (top, full width) */
+.cp--ex{grid-column:1 / -1;background:var(--ice)}
+.ai-tag{display:inline-block;vertical-align:4px;font-size:12px;font-weight:700;letter-spacing:.06em;padding:1px 8px;border:2px solid var(--ink);border-radius:10px;background:var(--hi)}
+.ex{display:grid;gap:clamp(14px,2vw,24px);align-items:start}
+@media (min-width:900px){.ex{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}}
+.ex__in{display:flex;flex-direction:column;gap:10px;min-width:0}
+.ex .ta{background:#fff}
+.linkb{align-self:flex-start;background:none;border:0;color:var(--blue);text-decoration:underline;text-decoration-style:dashed;font:inherit;font-size:15px;padding:2px 0;cursor:pointer}
+.or{display:flex;align-items:center;gap:10px;color:var(--mute);font-size:14px}.or:before,.or:after{content:"";flex:1;border-top:2px dashed var(--dash)}
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:16px 12px;border:2.5px dashed var(--ink);border-radius:var(--r3);background:#fff;cursor:pointer;overflow:hidden}
+.drop:hover,.drop.over{background:var(--cream)}.drop:focus-within{outline:3px solid var(--blue)}
+.drop__ic{font-size:28px;line-height:1}.drop b{word-break:break-all}
+.drop img{max-height:170px;max-width:100%;margin-top:8px;border:2px solid var(--ink);border-radius:6px;object-fit:contain;background:#fff}.drop img[hidden]{display:none}
+.drop.has .drop__ic{display:none}
+.ex__out{display:flex;flex-direction:column;gap:10px;min-width:0}.ex__out:empty{display:none}
+.found{list-style:none;display:flex;flex-direction:column;gap:8px}
+.found li{padding:8px 10px;background:#fff}.found li.off{opacity:.55;background:var(--pale)}
+.found label{display:flex;align-items:center;gap:10px;flex-wrap:wrap;cursor:pointer}
+.fv{flex:1;display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;min-width:140px;font-size:15px}.fv b{font-size:19px}
+.fv__why{font-size:13.5px;line-height:1.4;color:var(--mute);margin:4px 0 0 32px}
+.role{font-size:12px;padding:1px 9px;border:1.5px solid var(--ink);border-radius:12px;background:#fff}.role--dependent{background:var(--hi)}
+.ex__warn{font-size:13.5px;color:var(--mute)}
 .c-rp{display:flex;align-items:center;gap:10px;cursor:pointer}
 input[type=checkbox]{position:absolute;opacity:0;width:1px;height:1px}
 .cb{width:22px;height:22px;flex:none;border:2.5px solid var(--ink);border-radius:6px 2px 6px 2px;background:#fff;display:grid;place-items:center}

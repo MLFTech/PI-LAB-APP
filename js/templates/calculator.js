@@ -29,12 +29,30 @@
   const fnSym = (g) => (g.named && (g.named.type === 'named' || g.named.type === 'given') ? sym(g.named.symbol) : g.id);
 
   P.templates.calculator = function (d) {
-    const i = d.input, a = d.answer;
+    const i = d.input, a = d.answer, x = d.extractor;
     return `<div class="page">
     <div class="crumb"><a href="#/">Home</a> / Calculator</div>
     <h1>${d.title}</h1><p class="lead" style="margin-top:10px;max-width:60ch">${d.lead}</p>
     <div class="calc">
-      <section class="sk cp cp--in" aria-labelledby="c2"><div class="cp__h"><span class="num">1</span><h2 id="c2">${i.title}</h2></div>
+      <section class="sk cp cp--ex" aria-labelledby="c1"><div class="cp__h"><span class="num">1</span><h2 id="c1">${x.title} <span class="ai-tag">AI</span></h2></div>
+        <p class="cp__hint">${x.hint}</p>
+        <div class="ex">
+          <div class="ex__in">
+            <label class="sr" for="ex-text">Problem statement</label>
+            <textarea id="ex-text" class="inp ta" rows="5" maxlength="4000" placeholder="${esc(x.placeholder)}"></textarea>
+            <button class="linkb" type="button" data-act="sample">${x.sampleLabel}</button>
+            <div class="or"><span>and / or</span></div>
+            <label class="drop" id="ex-drop" for="ex-file"><input id="ex-file" type="file" accept="image/jpeg,image/png,image/gif,image/webp" class="sr">
+              <span class="drop__ic" aria-hidden="true">🖼</span><b>${x.drop}</b><span class="note">${x.dropNote}</span>
+              <img id="ex-prev" alt="Preview of the problem picture" hidden></label>
+            <div class="row-act"><button class="btn btn--p" type="button" data-act="extract">${x.button}</button>
+              <button class="btn btn--sm" type="button" data-act="exclear">Clear</button></div>
+          </div>
+          <div id="ex-out" class="ex__out" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="sk cp cp--in" aria-labelledby="c2"><div class="cp__h"><span class="num">2</span><h2 id="c2">${i.title}</h2></div>
         <p class="cp__hint">${i.hint}</p>
         <div class="count"><label for="nvar">Number of variables</label>
           <div class="stepper"><button type="button" data-act="dec" aria-label="Fewer variables">−</button><input id="nvar" class="inp" type="number" min="1" max="${d.maxRows}" value="${i.initial.length}" inputmode="numeric"><button type="button" data-act="inc" aria-label="More variables">+</button></div>
@@ -48,7 +66,7 @@
         <div class="row-act"><button class="btn btn--sm" type="button" data-act="add">+ Add row</button><button class="btn btn--p" type="button" data-act="calc">Calculate Π groups</button></div>
       </section>
 
-      <section class="sk cp cp--out" id="answer" aria-labelledby="c3"><div class="cp__h"><span class="num">2</span><h2 id="c3">${a.title}</h2></div>
+      <section class="sk cp cp--out" id="answer" aria-labelledby="c3"><div class="cp__h"><span class="num">3</span><h2 id="c3">${a.title}</h2></div>
         <div id="ans" aria-live="polite"><p class="note">${a.empty}</p></div>
       </section>
     </div></div>`;
@@ -161,23 +179,80 @@
     nvar.addEventListener('input', () => { const v = parseInt(nvar.value, 10); if (v >= 1) resize(v); });
     nvar.addEventListener('blur', () => { nvar.value = rows.length; });
 
-    /* the solver */
     const csrf = () => (document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/) || [])[1] || '';
+    /** POST JSON to the Django backend; throws 'csrf' or 'offline' when the reply is not the API's JSON */
+    async function post(url, body) {
+      const res = await fetch(url, { method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf() }, body: JSON.stringify(body) });
+      if (!(res.headers.get('content-type') || '').includes('application/json')) throw new Error(res.status === 403 ? 'csrf' : 'offline');
+      return res.json();
+    }
+    const failMsg = (e) => (e.message === 'csrf' ? 'The page lost its security token. Reload the page and try again.' : d.answer.offline);
+
+    /* AI variable extractor (backend: pigroups/extract.py) */
+    const x = d.extractor, exOut = $('#ex-out'), exText = $('#ex-text'), exFile = $('#ex-file'), exPrev = $('#ex-prev'), exDrop = $('#ex-drop');
+    let picture = null, found = [];                                     // picture = {media_type, data (base64)}
+    /** shrink the picture in the browser (longest side 1568 px, JPEG) so the upload stays small */
+    function readPicture(file) {
+      if (!file || !/^image\//.test(file.type)) { exOut.innerHTML = '<p class="note warn">Please choose a picture file (JPG or PNG).</p>'; return; }
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => {
+        const s = Math.min(1, 1568 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * s); c.height = Math.round(img.naturalHeight * s);
+        const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+        const dataUrl = c.toDataURL('image/jpeg', 0.88);
+        picture = { media_type: 'image/jpeg', data: dataUrl.split(',')[1] };
+        exPrev.src = dataUrl; exPrev.hidden = false; exDrop.classList.add('has'); P.$('b', exDrop).textContent = file.name || 'Pasted picture';
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); exOut.innerHTML = '<p class="note warn">That picture could not be opened. Try a JPG or PNG.</p>'; };
+      img.src = url;
+    }
+    exFile.addEventListener('change', () => readPicture(exFile.files[0]));
+    ['dragenter', 'dragover'].forEach((t) => exDrop.addEventListener(t, (e) => { e.preventDefault(); exDrop.classList.add('over'); }));
+    ['dragleave', 'drop'].forEach((t) => exDrop.addEventListener(t, (e) => { e.preventDefault(); exDrop.classList.remove('over'); }));
+    exDrop.addEventListener('drop', (e) => readPicture(e.dataTransfer.files[0]));
+    $('.cp--ex').addEventListener('paste', (e) => {                    // paste a screenshot straight into the card
+      const f = [...((e.clipboardData && e.clipboardData.files) || [])].find((x) => /^image\//.test(x.type));
+      if (f) { e.preventDefault(); readPicture(f); }
+    });
+    function showFound(r) {
+      found = r.variables.map((v) => ({ ...v, on: true }));
+      exOut.innerHTML = `<p class="lbl">${x.found}</p>` + (found.length ? `<ul class="found">${found.map((v, n) => `<li class="sk sk--sm"><label>
+          <input type="checkbox" data-n="${n}" checked><span class="cb" aria-hidden="true"></span>
+          <span class="fv"><b class="math">${esc(v.symbol)}</b> <span>${esc(v.name)}</span><span class="note">[${dimTxt(v.dims)}]</span></span>
+          <span class="role role--${v.role}">${v.role}</span></label>${v.reason ? `<p class="fv__why">${esc(v.reason)}</p>` : ''}</li>`).join('')}</ul>
+        <button class="btn btn--p btn--sm" type="button" data-act="use">${x.add}</button>` : `<p class="note">${x.none}</p>`)
+        + (r.note ? `<p class="note">${esc(r.note)}</p>` : '') + `<p class="note ex__warn">${x.disclaimer}</p>`;
+    }
+    exOut.addEventListener('change', (e) => {
+      const n = e.target.dataset.n; if (n == null) return;
+      found[n].on = e.target.checked; e.target.closest('li').classList.toggle('off', !e.target.checked);
+    });
+    async function extractVars(btn) {
+      const text = exText.value.trim();
+      if (!text && !picture) { exOut.innerHTML = '<p class="note warn">Type the problem statement or add a picture first.</p>'; exText.focus(); return; }
+      btn.disabled = true; const label = btn.textContent; btn.textContent = x.working;
+      exOut.innerHTML = '<div class="think" aria-hidden="true"><i></i><i></i><i></i></div>';
+      try {
+        const r = await post(d.api.extract, { text, image: picture });
+        if (r.ok) showFound(r); else exOut.innerHTML = `<p class="note warn bad">${esc(r.error)}</p>`;
+      } catch (e) { exOut.innerHTML = `<p class="note warn">${failMsg(e)}</p>`; }
+      finally { btn.disabled = false; btn.textContent = label; }
+    }
+
+    /* the solver */
     async function calculate(btn) {
       btn.disabled = true; const label = btn.textContent; btn.textContent = 'Calculating…';
       ans.innerHTML = '<div class="think" aria-hidden="true"><i></i><i></i><i></i></div>';
       const payload = { dependent: dep, variables: rows.map((r) => ({ name: r.name.trim(), dims: r.d, repeating: r.rep })) };
       try {
-        const res = await fetch(d.api.piGroups, { method: 'POST', credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf() }, body: JSON.stringify(payload) });
-        const type = res.headers.get('content-type') || '';
-        if (!type.includes('application/json')) throw new Error(res.status === 403 ? 'csrf' : 'offline');
-        const r = await res.json();
+        const r = await post(d.api.piGroups, payload);
         if (!r.ok) { last = null; ans.innerHTML = `<p class="note warn bad">${esc(r.error)}</p>`; }
         else { last = r; ans.innerHTML = answerHtml(r, d); }
       } catch (e) {
         last = null;
-        ans.innerHTML = `<p class="note warn">${e.message === 'csrf' ? 'The page lost its security token. Reload the page and try again.' : d.answer.offline}</p>`;
+        ans.innerHTML = `<p class="note warn">${failMsg(e)}</p>`;
       } finally {
         btn.disabled = false; btn.textContent = label;
         const a = $('#answer'); a.classList.remove('flash'); void a.offsetWidth; a.classList.add('flash');
@@ -191,6 +266,18 @@
     }
 
     const act = {
+      sample() { exText.value = x.sample; exText.focus(); },
+      exclear() {
+        exText.value = ''; picture = null; found = []; exFile.value = ''; exOut.innerHTML = '';
+        exPrev.removeAttribute('src'); exPrev.hidden = true; exDrop.classList.remove('has'); P.$('b', exDrop).textContent = x.drop;
+      },
+      extract(btn) { extractVars(btn); },
+      use() {                                                           // put the ticked variables into the table
+        const pick = found.filter((v) => v.on); if (!pick.length) return;
+        rows = pick.slice(0, max).map((v) => ({ name: v.symbol, d: v.dims.slice(), rep: false }));
+        const k = pick.slice(0, max).findIndex((v) => v.role === 'dependent'); dep = k >= 0 ? k : null;
+        draw(); $('#c2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
       dec() { resize(rows.length - 1); }, inc() { resize(rows.length + 1); },
       add() { if (rows.length < max) { rows.push(blank()); draw(); const l = rowsEl.querySelector('.crow:last-child .c-nm'); l && l.focus(); } },
       del(btn) {

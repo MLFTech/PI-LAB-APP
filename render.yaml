@@ -9,7 +9,7 @@ services:
     branch: main
     buildCommand: bash build.sh
     startCommand: gunicorn --chdir backend pilab_site.wsgi:application
-    healthCheckPath: /privacy/
+    healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION
         value: 3.13.5
@@ -17,17 +17,7 @@ services:
         value: "0"
       - key: PILAB_SECRET_KEY
         generateValue: true          # Render makes a long random key
-      - key: DATABASE_URL
-        sync: false                  # the connection string from Neon (postgresql://…?sslmode=require)
-      - key: PILAB_GOOGLE_CLIENT_ID
-        sync: false                  # from Google Cloud Console > Clients > your web client
-      - key: PILAB_GOOGLE_CLIENT_SECRET
-        sync: false
-      - key: PILAB_ADMIN_USERNAME
-        sync: false                  # your /admin/ login, created on the first deploy
-      - key: PILAB_ADMIN_EMAIL
-        sync: false
-      - key: PILAB_ADMIN_PASSWORD
-        sync: false                  # at least 12 characters
-      - key: PILAB_CONTACT_EMAIL
-        sync: false                  # shown on /privacy/
+      - key: ANTHROPIC_API_KEY
+        sync: false                  # for the AI variable extractor (console.anthropic.com > API keys)
+      - key: PILAB_EXTRACT_PER_HOUR
+        value: "20"                  # AI extractor uses per visitor per hour (limits API cost)

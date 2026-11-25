@@ -1,27 +1,24 @@
-/* Feedback page wording. The questions themselves live in backend/feedback/questions.py
-   (one place for the form, the database checks and the spreadsheet); the page fetches them from `api.questions`. */
+/* Feedback page wording. The questionnaire itself is a Google Form (formUrl). */
 window.PiLab.feedback = {
   title: 'Feedback',
-  lead: 'Help improve Pi Lab. This short questionnaire takes about 5 minutes and is part of a final year project on learning with interactive tools.',
-  privacy: 'Your Google email, name, occupation and answers are saved by Pi Lab and used only to evaluate this project. Results are reported as totals, never with your name or email. <a href="privacy/">Privacy policy</a>',
-  api: { questions: 'api/feedback/questions/', submit: 'api/feedback/' },
-  required: 'required',
-  otherLabel: 'Please type your occupation',
-  submit: 'Send feedback',
-  progress: (done, total) => `${done} of ${total} required answers`,
-  missing: 'Please answer the highlighted question first.',
-  thanks: { title: 'Thank you!', text: 'Your feedback has been saved. It really helps this project.' },
-  signin: {
-    title: 'Sign in to give feedback',
-    text: 'Please sign in with your Google account first. Each account can send the questionnaire once, so every response comes from a different person.',
-    button: 'Sign in with Google',
-    why: 'Pi Lab saves your Google email address with your answers, only to make sure each person responds once.',
-    notGoogle: 'You are signed in with an admin account. Sign out, then sign in with Google to answer.',
-    notSetUp: 'Google sign-in is not set up on this server yet, so the questionnaire is closed. Site owner: see "Google sign-in" in README.md.',
-    as: 'Signed in as', notYou: 'Not you? Sign out',
-    doneTitle: 'You have already responded',
-    doneText: (email, when) => `Thank you! Feedback from <b>${email}</b> was received${when ? ' on ' + when : ''}. Each Google account can respond once.`,
+  lead: 'Your opinion helps a research study and makes Pi Lab better for the next student.',
+  formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfAR1hMG3z_XrsWKfO0SI1sj1BMLHpB6w6cIYjr48IAG5efzQ/viewform?usp=publish-editor',
+  why: {
+    title: 'Why your feedback matters',
+    paragraphs: [
+      'Pi Lab was built as part of my <b>final year project</b>: a research study on whether an interactive website can help students learn dimensional analysis and the Buckingham Pi theorem more easily than notes alone.',
+      'Your answers are the <b>data of this study</b>. They show how easy Pi Lab is to use, how much the guide, exercises and calculator help you learn, and what should be improved. Every response counts, whether you are a student, a lecturer or an engineer.',
+    ],
   },
-  offline: 'The feedback form needs the Pi Lab server. Start it from the pilab folder with <code>python backend/manage.py runserver</code>, then open <code>http://127.0.0.1:8000/#/feedback</code>.',
-  draftNote: 'Your answers are kept in this browser until you send them.',
+  expect: {
+    title: 'What to expect',
+    items: [
+      ['⏱', 'About <b>5 minutes</b> to complete'],
+      ['✎', 'Short questions on ease of use, learning and the parts of Pi Lab you tried'],
+      ['✓', 'Voluntary: answer only what you are comfortable with'],
+    ],
+  },
+  button: 'Open the feedback form',
+  host: 'Opens in a new tab on Google Forms.',
+  thanks: 'Thank you for helping my research!',
 };

@@ -135,4 +135,74 @@ class Api(SimpleTestCase):
     def test_page_and_files_are_served(self):
         self.assertContains(self.client.get('/'), 'Pi Lab')
         self.assertEqual(self.client.get('/js/app.js').status_code, 200)
+        self.assertEqual(self.client.get('/img/logo.svg').status_code, 200)
         self.assertEqual(self.client.get('/api/named-groups/').status_code, 200)
+
+
+class FakeClaude:
+    """Stands in for anthropic.Anthropic(): returns a fixed JSON answer and records the request (no API call)."""
+    def __init__(self, answer, stop_reason='end_turn'):
+        from types import SimpleNamespace as NS
+        self.sent = None
+        reply = NS(stop_reason=stop_reason, content=[NS(type='thinking', thinking=''), NS(type='text', text=json.dumps(answer))])
+
+        def create(**kw):
+            self.sent = kw
+            return reply
+        self.beta = NS(messages=NS(create=create))
+
+
+class Extractor(SimpleTestCase):
+    ANSWER = {'note': '', 'variables': [
+        {'symbol': 'F_D', 'name': 'drag force', 'M': 1, 'L': 1, 'T': -2, 'Theta': 0, 'role': 'dependent', 'reason': 'asked'},
+        {'symbol': 'ρ', 'name': 'density', 'M': 1, 'L': -3, 'T': 0, 'Theta': 0, 'role': 'independent', 'reason': 'fluid'},
+        {'symbol': 'ρ', 'name': 'duplicate', 'M': 1, 'L': -3, 'T': 0, 'Theta': 0, 'role': 'independent', 'reason': 'x'},
+        {'symbol': 'V', 'name': 'speed', 'M': 0, 'L': 1, 'T': -1, 'Theta': 0, 'role': 'dependent', 'reason': 'second dep'},
+        {'symbol': 'bad', 'name': 'out of range', 'M': 99, 'L': 0, 'T': 0, 'Theta': 0, 'role': 'independent', 'reason': ''}]}
+
+    def test_text_is_sent_and_answer_cleaned(self):
+        from .extract import extract
+        fake = FakeClaude(self.ANSWER)
+        r = extract({'text': 'Drag on a sphere in water.'}, client=fake)
+        self.assertEqual([v['symbol'] for v in r['variables']], ['F_D', 'ρ', 'V'])   # duplicate and bad dims dropped
+        self.assertEqual([v['role'] for v in r['variables']], ['dependent', 'independent', 'independent'])
+        self.assertEqual(r['variables'][1]['dims'], [1, -3, 0, 0])
+        self.assertEqual(fake.sent['model'], 'claude-opus-5-5')
+        self.assertEqual(fake.sent['output_config']['format']['type'], 'json_schema')
+        self.assertEqual(fake.sent['fallbacks'], 'default')
+
+    def test_picture_becomes_an_image_block(self):
+        import base64
+        from .extract import extract
+        fake = FakeClaude(self.ANSWER)
+        png = base64.b64encode(b'\x89PNG\r\n\x1a\nfake').decode()
+        extract({'image': {'media_type': 'image/png', 'data': png}}, client=fake)
+        block = fake.sent['messages'][0]['content'][0]
+        self.assertEqual((block['type'], block['source']['media_type']), ('image', 'image/png'))
+
+    def test_bad_input(self):
+        from .extract import extract
+        fake = FakeClaude(self.ANSWER)
+        for payload, msg in [({}, 'Type the problem'), ({'text': 'x' * 5000}, 'too long'),
+                             ({'image': {'media_type': 'image/bmp', 'data': 'AA=='}}, 'JPG, PNG'),
+                             ({'image': {'media_type': 'image/png', 'data': '!!notbase64'}}, 'could not be read')]:
+            with self.assertRaisesMessage(PiError, msg):
+                extract(payload, client=fake)
+        with self.assertRaisesMessage(PiError, 'could not help'):
+            extract({'text': 'x'}, client=FakeClaude(self.ANSWER, stop_reason='refusal'))
+
+    def test_api_without_key_explains(self):
+        from unittest import mock
+        with mock.patch.dict('os.environ', {'ANTHROPIC_API_KEY': '', 'ANTHROPIC_AUTH_TOKEN': ''}):
+            res = self.client.post('/api/extract-variables/', json.dumps({'text': 'drag on a sphere'}),
+                                   content_type='application/json')
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('not set up', res.json()['error'])
+
+    def test_hourly_limit(self):
+        from django.core.cache import cache
+        cache.clear()
+        with self.settings(EXTRACT_PER_HOUR=2):
+            codes = [self.client.post('/api/extract-variables/', '{}', content_type='application/json').status_code
+                     for _ in range(3)]
+        self.assertEqual(codes, [400, 400, 429])

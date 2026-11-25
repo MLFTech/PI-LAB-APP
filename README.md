@@ -1,30 +1,34 @@
 # Pi Lab
 
-Responsive app (no build step). The pages are plain HTML/CSS/JS; the calculator's Π-group solver is Python, served by Django.
+Responsive app (no build step). The pages are plain HTML/CSS/JS; the calculator's Π-group solver and AI variable
+extractor are Python, served by Django. No database.
 
 ```
 pip install -r backend/requirements.txt
-python backend/manage.py migrate                 # once: creates the feedback database backend/db.sqlite3
-python backend/manage.py runserver               # then open http://127.0.0.1:8000
-python backend/manage.py test pigroups feedback accounts   # solver, feedback, sign-in and API tests
+python backend/manage.py runserver           # then open http://127.0.0.1:8000
+python backend/manage.py test pigroups       # solver, extractor and API tests (no API key or cost needed)
 ```
 
-Without Django (`python -m http.server`) every page works except the calculator's **Calculate Π groups** button
-and the **Feedback** form.
+The AI variable extractor needs an Anthropic API key (console.anthropic.com > API keys) in the environment:
+`$env:ANTHROPIC_API_KEY = "sk-ant-..."` (PowerShell) before `runserver`. Without it, everything else works and the
+extractor says it is not set up. Without Django (`python -m http.server`) every page works except the calculator's
+**Extract variables** and **Calculate Π groups** buttons.
 
 ```
 index.html            shell
-css/                  tokens, components, home, guide, exercise
+css/                  tokens, components, home, guide, exercise, calculator, keyboard, feedback
+img/logo.svg          the logo (header and browser tab)
 js/core/util.js       helpers + registries
 js/components/        reusable widgets: symbol-keyboard.js (symbol keyboard)
 js/templates/         layouts only: home.js, guide.js, exercise.js, calculator.js, feedback.js
 js/activities/        interactive exercise types: sort, balance, crew, tuner, exponents, equation, tunnel
 js/app.js             header + hash router + data loader
-backend/              Django project: pilab_site/ (settings, urls) + pigroups/ (solver) + feedback/ (questionnaire)
-                      + accounts/ (sign in with Google)
+backend/              Django project: pilab_site/ (settings, urls) + pigroups/ (solver + AI extractor)
 data/manifest.js      list of data files to load
 data/shared.js        content shared by guides (repeating-variable guidelines)
 data/home.js          home page content
+data/calculator.js    calculator wording, the extractor's example, the starting table
+data/feedback.js      feedback page wording and the Google Form link (formUrl)
 data/keyboard.js      symbol keyboard keys (tabs > groups > [label, meaning, insert?])
 data/symbols/*.js     variable symbols for the keyboard's Fluid mechanics and Heat transfer tabs,
                       one row each: [symbol, meaning, M, L, T, Θ]. Tapping one in the calculator
@@ -61,7 +65,8 @@ named_groups.py  reads each variable as a physical kind (symbol + dimensions) an
                  Ec, Br, Gr, Ra, Fo, Ja, Sc, Le, βΔT … also inverses/powers (1/Re, Fr²) and products (Re·Pr)
 service.py       request -> answer: validates the ticked repeating set (or picks the best one), and multiplies
                  groups together (Π₁ ÷ Π₄ …) to reach named numbers, e.g. Q/(kDΔT) = Nu
-views.py         GET /  (page + CSRF cookie) · POST /api/pi-groups/ · GET /api/named-groups/
+extract.py       AI variable extractor (below)
+views.py         GET /  (page + CSRF cookie) · POST /api/pi-groups/ · POST /api/extract-variables/ · GET /api/named-groups/
 ```
 
 `POST /api/pi-groups/` body: `{"dependent": 0, "variables": [{"name": "ρ", "dims": [1,-3,0,0], "repeating": true}, …]}`
@@ -69,84 +74,42 @@ views.py         GET /  (page + CSRF cookie) · POST /api/pi-groups/ · GET /api
 Errors come back as `{"ok": false, "error": "…"}` with status 400, worded for the student.
 Add a named number: append it to `NAMED` in `named_groups.py` (and any new kind to `KINDS`).
 
-For a public deployment set `PILAB_SECRET_KEY`, `PILAB_DEBUG=0`, `PILAB_ALLOWED_HOSTS`, and let the web server serve
-`css/`, `js/` and `data/` directly.
+## AI variable extractor (backend/pigroups/extract.py)
+The first card of the calculator. The student types the problem statement and/or adds a picture of it (the browser
+shrinks it to at most 1568 px before upload); Claude lists the variables involved with their M, L, T, Θ powers and which
+one is dependent; **Use these in the table** fills the variable table.
 
-## Feedback questionnaire (backend/feedback)
-The **Feedback** page (`#/feedback`) first asks people to **sign in with Google** (one response per Google account;
-the email is saved with the answers). Then it asks for name (pre-filled from Google) and occupation, then:
+- Model: Claude Opus 5.5 (`claude-opus-5-5`, change with `PILAB_EXTRACT_MODEL`), through the official `anthropic` SDK.
+  The reply is constrained to a JSON schema (structured outputs) and checked again on the server. Server-side
+  fallbacks are on (`fallbacks="default"`): if the model declines for policy reasons, the API retries on a fallback model.
+- `POST /api/extract-variables/` body: `{"text": "…", "image": {"media_type": "image/jpeg", "data": "<base64>"} | null}`
+  -> `{"ok": true, "variables": [{"symbol", "name", "dims", "role", "reason"}], "note"}`.
+- Each call costs API credit, so each visitor may use it `PILAB_EXTRACT_PER_HOUR` times an hour (default 20).
+- Tests use a stand-in for Claude, so `manage.py test` never calls the API.
 
-| Section | What it measures | Items |
-|---|---|---|
-| A About you | name, occupation, field, prior knowledge, parts of Pi Lab used | 5 |
-| B Ease of use | System Usability Scale (SUS1–SUS10), scored 0–100 (≈68 is average) | 10 |
-| C Learning | perceived learning and usefulness of guide, exercises, calculator (L1–L8) | 8 |
-| D Engagement | interest, design, clarity, device, preference (E1–E5), overall rating, recommend 0–10 (NPS) | 7 |
-| E Comments | liked most, improvements, problems (optional) | 3 |
+## Feedback
+The **Feedback** page explains why feedback matters for the final year project and links to the Google Form
+(`formUrl` in `data/feedback.js`). Responses are collected and exported by Google Forms (Responses > Link to Sheets).
 
-```
-questions.py   every question (wording, type, column code), SUS scoring. Edit wording here only.
-validate.py    checks a submitted form; errors are worded for the person filling it in
-models.py      Response: submitted time, Google user + email (unique: one per account), name, occupation,
-               answers (JSON by code), SUS score
-views.py       GET /api/feedback/questions/ · POST /api/feedback/ · GET /api/feedback/export.xlsx|.csv (staff only)
-admin.py       /admin/: list, search and filter responses; download all or the ticked ones
-export.py      .xlsx (no extra package) with sheets Responses, Summary (means, SD, % agree, SUS, NPS), Questions; or .csv
-```
+## Put Pi Lab online with Render (free)
+Files: `render.yaml` (the Render setup) and `build.sh` (runs on each deploy).
 
-Read and download the responses:
-1. `python backend/manage.py createsuperuser` (once) to make your admin login.
-2. Open http://127.0.0.1:8000/admin/ > Feedback responses > **Download all as Excel (.xlsx)**.
-   Or from the terminal: `python backend/manage.py export_feedback` (or `export_feedback results.csv`).
-
-`backend/db.sqlite3` holds people's names: keep it private and do not share or upload it with the code.
-
-## Google sign-in (backend/accounts)
-Uses Google's OAuth 2.0 / OpenID Connect code flow with the standard library only (no extra package).
-The **Sign in with Google** button sits in the header; the feedback form requires it.
-
-One-time setup in [Google Cloud Console](https://console.cloud.google.com/):
-1. Create a project (or pick one). **APIs & Services > OAuth consent screen**: User type **External**, fill in the
-   app name and your email, scopes `openid`, `email`, `profile` (the defaults; no verification needed).
-2. While the app is in **Testing**, only the emails listed under *Test users* can sign in (up to 100). To let anyone
-   with a Google account respond, press **Publish app**.
-3. **APIs & Services > Credentials > Create credentials > OAuth client ID**, type **Web application**.
-   Authorised redirect URIs (exactly, with the final slash):
-   `http://127.0.0.1:8000/auth/google/callback/` and `http://localhost:8000/auth/google/callback/`
-   (for a public site add `https://your-domain/auth/google/callback/`).
-4. Press **Download JSON** and save the file as `backend/google_oauth.json`
-   (or set `PILAB_GOOGLE_CLIENT_ID` and `PILAB_GOOGLE_CLIENT_SECRET`). Restart the server.
-
-`backend/google_oauth.json` holds a secret: keep it private, like `db.sqlite3`.
-Each Google account becomes a Django user named `google:<id>`; they can never log in to /admin/.
-
-## Put Pi Lab online with Render + Neon (free)
-Render runs the site from GitHub; Neon keeps the feedback in PostgreSQL (Render's free disk is wiped on restart,
-and its free database expires after 30 days). Files: `render.yaml` (the Render setup), `build.sh` (runs on deploy).
-
-1. **Neon** (neon.tech): sign up, create a project (region: Singapore / AWS ap-southeast-1), copy the
-   **connection string** (`postgresql://…?sslmode=require`).
-2. **Render** (render.com): sign up with GitHub, **New > Blueprint**, pick `MLFTech/PI-LAB-APP`. Fill in the asked values:
-   `DATABASE_URL` (Neon string), `PILAB_GOOGLE_CLIENT_ID` / `PILAB_GOOGLE_CLIENT_SECRET` (from google_oauth.json),
-   `PILAB_ADMIN_USERNAME` / `_EMAIL` / `_PASSWORD` (your /admin/ login, password 12+ characters), `PILAB_CONTACT_EMAIL`.
-   Deploy. The site is at `https://pi-lab.onrender.com` (or the name Render shows).
-3. **Google Cloud Console**: add `https://YOUR-SITE.onrender.com/auth/google/callback/` to the client's redirect URIs;
-   Branding: home page `https://YOUR-SITE.onrender.com/`, privacy `https://YOUR-SITE.onrender.com/privacy/`,
-   authorised domain `YOUR-SITE.onrender.com`; then Audience > Publish app.
+1. **Render** (render.com): sign up with GitHub, **New > Blueprint**, pick `MLFTech/PI-LAB-APP`.
+2. When asked, paste your `ANTHROPIC_API_KEY`. Deploy. The site is at `https://pi-lab.onrender.com`
+   (or the name Render shows).
 
 Every `git push` to `main` redeploys automatically. Free Render sites sleep after 15 minutes without visitors;
 the next visit takes up to about a minute to wake it.
 
 ## Put Pi Lab online (PythonAnywhere, free)
-1. `python backend/make_upload_zip.py` makes `pilab-upload.zip` on the Desktop (no database, no Google secret).
-2. Sign up at pythonanywhere.com (free "Beginner" account). Your site will be `https://USERNAME.pythonanywhere.com`.
-3. **Files** tab: upload the zip. **Consoles > Bash**:
+1. Sign up at pythonanywhere.com (free "Beginner" account). Your site will be `https://USERNAME.pythonanywhere.com`.
+2. **Consoles > Bash**:
    ```
-   unzip pilab-upload.zip
-   mkvirtualenv --python=python3.13 pilab        # newest Python offered; Django 5.2 is chosen automatically on older ones
+   git clone https://github.com/MLFTech/PI-LAB-APP.git pilab
+   mkvirtualenv --python=python3.13 pilab        # newest Python offered
    pip install -r pilab/backend/requirements.txt
    ```
-4. **Web** tab > Add a new web app > *Manual configuration* > same Python version. Then set
+3. **Web** tab > Add a new web app > *Manual configuration* > same Python version. Then set
    *Virtualenv* `/home/USERNAME/.virtualenvs/pilab`, *Source code* `/home/USERNAME/pilab`, turn on *Force HTTPS*,
    and replace the WSGI file with:
    ```python
@@ -156,25 +119,12 @@ the next visit takes up to about a minute to wake it.
    os.environ['PILAB_DEBUG'] = '0'
    os.environ['PILAB_SECRET_KEY'] = 'PASTE-A-LONG-RANDOM-KEY'
    os.environ['PILAB_ALLOWED_HOSTS'] = 'USERNAME.pythonanywhere.com'
-   os.environ['PILAB_GOOGLE_REDIRECT_URI'] = 'https://USERNAME.pythonanywhere.com/auth/google/callback/'
-   os.environ['PILAB_CONTACT_EMAIL'] = 'you@example.com'      # shown on /privacy/
+   os.environ['ANTHROPIC_API_KEY'] = 'sk-ant-...'
    from django.core.wsgi import get_wsgi_application
    application = get_wsgi_application()
    ```
-   Make a key with `python -c "import secrets; print(secrets.token_urlsafe(50))"`.
-5. Back in the Bash console (same variables as the WSGI file, for these commands):
-   ```
-   cd ~/pilab
-   export PILAB_DEBUG=0 PILAB_SECRET_KEY=same-key PILAB_ALLOWED_HOSTS=USERNAME.pythonanywhere.com
-   python backend/manage.py migrate
-   python backend/manage.py collectstatic --noinput
-   python backend/manage.py createsuperuser
-   ```
-6. **Web** tab > Static files: URL `/static/` -> `/home/USERNAME/pilab/backend/staticfiles`.
-7. Upload `backend/google_oauth.json` (Files tab) into `/home/USERNAME/pilab/backend/`, then press **Reload**.
-8. Google Cloud Console: add `https://USERNAME.pythonanywhere.com/auth/google/callback/` to the OAuth client's
-   redirect URIs; Branding: home page `https://USERNAME.pythonanywhere.com/`, privacy policy
-   `https://USERNAME.pythonanywhere.com/privacy/`, authorised domain `USERNAME.pythonanywhere.com`. Then Audience > Publish app.
+   Make a key with `python -c "import secrets; print(secrets.token_urlsafe(50))"`. Press **Reload**.
 
-To update the site later: make a new zip, upload, `unzip -o pilab-upload.zip`, then Reload on the Web tab.
-The online database is separate from the one on your computer; download responses from the online /admin/.
+To update the site later: `cd ~/pilab && git pull`, then **Reload** on the Web tab.
+Free PythonAnywhere accounts can only reach an allow-list of websites; check that api.anthropic.com is on it,
+or the extractor will report that it cannot reach the AI service.

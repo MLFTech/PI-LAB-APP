@@ -1,13 +1,15 @@
-"""HTTP layer: serves the Pi Lab page and the JSON API used by the calculator."""
+"""HTTP layer: serves the Pi Lab page and the JSON APIs used by the calculator (solver + AI variable extractor)."""
 import json
 
 from django.conf import settings
+from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST
 
 from . import named_groups
 from .engine import PiError
+from .extract import extract
 from .service import solve
 
 
@@ -33,6 +35,38 @@ def pi_groups(request):
         return _json({'ok': False, 'error': 'The request was not valid JSON.'}, 400)
     try:
         return _json(solve(payload))
+    except PiError as e:
+        return _json({'ok': False, 'error': str(e)}, 400)
+
+
+def _over_limit(request):
+    """At most settings.EXTRACT_PER_HOUR extractor calls per visitor (IP address) per hour: each call costs money."""
+    # behind the host's proxy the last X-Forwarded-For entry is the one the proxy saw (earlier ones can be faked)
+    ip = (request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[-1].strip()
+          or request.META.get('REMOTE_ADDR', '')) or 'unknown'
+    key = 'extract:' + ip
+    cache.add(key, 0, 3600)
+    try:
+        n = cache.incr(key)
+    except ValueError:                     # expired between add and incr
+        cache.set(key, 1, 3600)
+        n = 1
+    return n > settings.EXTRACT_PER_HOUR
+
+
+@require_POST
+def extract_variables(request):
+    """POST {text, image: {media_type, data(base64)} | null}  ->  {ok, variables: [{symbol, name, dims, role,
+    reason}], note}  or {ok: false, error} with status 400 (bad input / AI error) or 429 (too many requests)."""
+    try:
+        payload = json.loads(request.body.decode('utf-8') or '{}')
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return _json({'ok': False, 'error': 'The request was not valid JSON.'}, 400)
+    if _over_limit(request):
+        return _json({'ok': False, 'error': 'You have used the AI extractor many times this hour. '
+                                            'Please try again later, or type the variables into the table.'}, 429)
+    try:
+        return _json(extract(payload))
     except PiError as e:
         return _json({'ok': False, 'error': str(e)}, 400)
 
